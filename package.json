@@ -1,0 +1,24 @@
+{
+  "name": "aibot-java",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx parcel build index.html",
+    "server": "npx parcel serve index.html"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@codemirror/lang-java": "^6.0.1",
+    "@lezer/common": "^1.0.2",
+    "codemirror": "^6.0.1",
+    "openai": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.14.2",
+    "parcel": "^2.8.3",
+    "parcel-reporter-static-files-copy": "^1.5.0",
+    "process": "^0.11.10"
+  }
+}
