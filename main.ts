@@ -7,14 +7,7 @@ const run = async () => {
   let editor = new EditorView({
     extensions: [basicSetup, java(), helpPanel()],
     parent: document.getElementById("editor") as Element,
-  });
-
-  // Initial code state
-  editor.dispatch({
-    changes: {
-      from: 0,
-      insert: 'using System;\n\nSystem.out.println("Hello World!");',
-    },
+    doc: 'public class Main {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello, World!");\n\t}\n}'
   });
 
   const codeButton = document.getElementById("code-button");
@@ -25,7 +18,7 @@ const run = async () => {
         effects: toggleHelp.of(false),
       });
       editor.dispatch({
-        effects: toggleHelp.of(true),
+        effects: toggleHelp.of(true)
       });
     };
   }

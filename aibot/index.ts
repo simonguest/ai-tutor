@@ -3,7 +3,7 @@ import { StateField, StateEffect } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { keymap } from "@codemirror/view";
 
-import { send } from "./davinci";
+import { explain, translate } from "../openai";
 
 const toggleHelp = StateEffect.define<boolean>();
 
@@ -17,6 +17,7 @@ const helpPanelState = StateField.define<boolean>({
 });
 
 function createHelpPanel(view: EditorView) {
+  console.log(view);
   // Create the panel
   let dom = document.createElement("div");
   dom.className = "cm-help-panel";
@@ -33,9 +34,14 @@ function createHelpPanel(view: EditorView) {
     //TODO: Run through moderation endpoint to ensure it's not offensive
 
     // Send selection to OpenAI
-    send(selection).then((response) => {
-      dom.textContent = `\"${response.data.choices[0].text.replace("\n", " ").trim()}\"`;
+    explain(selection).then((response) => {
+      let answer = `\"${response.data.choices[0].text.replace("\n", " ").trim()}\"`;
+      dom.textContent = answer;
+      // translate(answer, "Swahili").then((response) => {
+      //   dom.textContent = `${response.data.choices[0].text.replace("\n", " ").trim()}`;
+      // });
     });
+    
   }
 
   return {
