@@ -15,10 +15,7 @@ const run = async () => {
     codeButton.onclick = () => {
       // Handle AI Bot tooltip click
       editor.dispatch({
-        effects: toggleHelp.of(false),
-      });
-      editor.dispatch({
-        effects: toggleHelp.of(true)
+        effects: toggleHelp.of({enabled: true, language: "en-us"}),
       });
     };
   }

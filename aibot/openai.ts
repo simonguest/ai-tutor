@@ -4,12 +4,6 @@ const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-
-    //TODO: Prompt design for students
-
-    //TODO: Maybe look at other language
-
-
 const explain = (code: string) => {
   const PROMPT = "/*\nIn one sentence, what does the above Java code do?";
   let openai = new OpenAIApi(configuration);
