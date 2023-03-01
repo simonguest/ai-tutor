@@ -21,29 +21,23 @@ function createHelpPanel(view: EditorView) {
   // Initialize the panel
   let dom = document.createElement("div");
   dom.className = "cm-help-panel";
-  dom.textContent = '"Thinking..."';
 
-    //TODO: Run through tree-sitter to ensure it's valid
-    setTimeout(() => {
-      view.dispatch({
-        effects: toggleHelp.of({
-          ...view.state.field(helpPanelState, false),
-          command: "validate",
-        }),
-      });
-    }, 1);
+  //TODO: Run through tree-sitter to ensure it's valid
+  setTimeout(() => {
+    view.dispatch({
+      effects: toggleHelp.of({
+        ...view.state.field(helpPanelState, false),
+        command: "validate",
+      }),
+    });
+  }, 1);
 
-    //TODO: Run through moderation endpoint to ensure it's not offensive
+  //TODO: Run through moderation endpoint to ensure it's not offensive
 
   return {
     top: true,
     dom,
     update(update) {
-      /* Thoughts on update logic:
-
-      { apiKey: "*", language: "ja-jp", command: "moderate | explain | translate", result: "text", error: "text" }
-
-      */
       console.log("Update in viewPlugin");
       let effect = update.state.field(helpPanelState, false);
       console.log(effect);
@@ -67,9 +61,9 @@ function createHelpPanel(view: EditorView) {
             view.dispatch({
               effects: toggleHelp.of({
                 ...view.state.field(helpPanelState, false),
-                command: "display",
+                command: "translate",
                 result:
-                  "The selection is not valid. Make sure you highlight a complete statement or block of code.",
+                  "The selection is not valid. Please highlight a complete statement or block of code.",
               }),
             });
           }
@@ -77,6 +71,7 @@ function createHelpPanel(view: EditorView) {
       }
 
       if (effect.command === "explain") {
+        dom.textContent = "[Thinking]";
         explain(selection).then((response) => {
           let answer = `\"${response.data.choices[0].text
             .replace("\n", " ")
@@ -84,24 +79,42 @@ function createHelpPanel(view: EditorView) {
           view.dispatch({
             effects: toggleHelp.of({
               ...view.state.field(helpPanelState, false),
-              command: "display",
+              command: "translate",
               result: answer,
             }),
           });
         });
       }
 
-      if (effect.command === "display") {
+      if (effect.command === "translate") {
+        dom.textContent = "[Translating]";
         if (effect.language === "en-us") {
-          dom.textContent = effect.result;
+          setTimeout(() => {
+            view.dispatch({
+              effects: toggleHelp.of({
+                ...view.state.field(helpPanelState, false),
+                command: "display",
+                result: effect.result,
+              }),
+            });
+          }, 1);
         } else {
-          dom.textContent = "Translating...";
           translate(effect.result, effect.language).then((response) => {
-            dom.textContent = `${response.data.choices[0].text
-              .replace("\n", " ")
-              .trim()}`;
+            view.dispatch({
+              effects: toggleHelp.of({
+                ...view.state.field(helpPanelState, false),
+                command: "display",
+                result: `${response.data.choices[0].text
+                  .replace("\n", " ")
+                  .trim()}`,
+              }),
+            });
           });
         }
+      }
+
+      if (effect.command === "display") {
+        dom.textContent = effect.result;
       }
     },
   };
