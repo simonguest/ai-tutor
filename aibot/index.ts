@@ -3,12 +3,8 @@ import { StateField, StateEffect } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { keymap } from "@codemirror/view";
 
-import { isValid } from "./parser";
 import { explain, translate, moderate } from "./openai";
 import { debug } from "./utils";
-
-const INVALID_CODE_MESSAGE =
-  "The selection is not valid. Please highlight a full statement or block of code. Also, please ensure you have not included any comments.";
 
 const MODERATION_FAILED_MESSAGE =
   "The selection is not appropriate and violates Code.org's terms of service.";
@@ -29,7 +25,6 @@ function createHelpPanel(view: EditorView) {
   let dom = document.createElement("div");
   dom.className = "cm-help-panel";
 
-  //TODO: Run through tree-sitter to ensure it's valid
   setTimeout(() => {
     view.dispatch({
       effects: toggleHelp.of({
@@ -69,29 +64,7 @@ function createHelpPanel(view: EditorView) {
             view.dispatch({
               effects: toggleHelp.of({
                 ...view.state.field(helpPanelState, false),
-                command: "validate",
-              }),
-            });
-          }
-        });
-      }
-
-      if (effect.command === "validate") {
-        isValid(selection, effect.strict).then((response) => {
-          if (response === true) {
-            // Valid code - dispatch to make a request to OpenAI
-            view.dispatch({
-              effects: toggleHelp.of({
-                ...view.state.field(helpPanelState, false),
                 command: "explain",
-              }),
-            });
-          } else {
-            view.dispatch({
-              effects: toggleHelp.of({
-                ...view.state.field(helpPanelState, false),
-                command: "translate",
-                result: INVALID_CODE_MESSAGE,
               }),
             });
           }
