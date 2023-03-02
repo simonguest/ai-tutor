@@ -4,7 +4,14 @@ import { EditorView } from "@codemirror/view";
 import { keymap } from "@codemirror/view";
 
 import { isValid } from "./parser";
-import { explain, translate } from "./openai";
+import { explain, translate, moderate } from "./openai";
+import { debug } from "./utils";
+
+const INVALID_CODE_MESSAGE =
+  "The selection is not valid. Please highlight a full statement or block of code. Also, please ensure you have not included any comments.";
+
+const MODERATION_FAILED_MESSAGE =
+  "The selection is not appropriate and violates Code.org's terms of service.";
 
 const toggleHelp = StateEffect.define<any>();
 
@@ -27,28 +34,50 @@ function createHelpPanel(view: EditorView) {
     view.dispatch({
       effects: toggleHelp.of({
         ...view.state.field(helpPanelState, false),
-        command: "validate",
+        command: "moderate",
       }),
     });
   }, 1);
-
-  //TODO: Run through moderation endpoint to ensure it's not offensive
 
   return {
     top: true,
     dom,
     update(update) {
-      console.log("Update in viewPlugin");
+      debug("Update in viewPlugin");
       let effect = update.state.field(helpPanelState, false);
-      console.log(effect);
+      debug(effect);
 
       // Capture the editor selection
       let range = view.state.selection.main;
       let doc = view.state.doc;
       let selection = doc.sliceString(range.from, range.to);
 
-      if (effect.command === "validate" || !effect.command) {
-        isValid(selection).then((response) => {
+      // Initial text update
+      dom.textContent = "[Thinking]";
+
+      if (effect.command === "moderate" || !effect.command) {
+        moderate(selection).then((response) => {
+          if (response === false) {
+            view.dispatch({
+              effects: toggleHelp.of({
+                ...view.state.field(helpPanelState, false),
+                command: "translate",
+                result: MODERATION_FAILED_MESSAGE,
+              }),
+            });
+          } else {
+            view.dispatch({
+              effects: toggleHelp.of({
+                ...view.state.field(helpPanelState, false),
+                command: "validate",
+              }),
+            });
+          }
+        });
+      }
+
+      if (effect.command === "validate") {
+        isValid(selection, effect.strict).then((response) => {
           if (response === true) {
             // Valid code - dispatch to make a request to OpenAI
             view.dispatch({
@@ -62,8 +91,7 @@ function createHelpPanel(view: EditorView) {
               effects: toggleHelp.of({
                 ...view.state.field(helpPanelState, false),
                 command: "translate",
-                result:
-                  "The selection is not valid. Please highlight a complete statement or block of code.",
+                result: INVALID_CODE_MESSAGE,
               }),
             });
           }
