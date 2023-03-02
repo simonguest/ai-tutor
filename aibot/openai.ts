@@ -6,19 +6,34 @@ const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+const SYSTEM_ROLE_CONTENT =
+  "You are a teaching assistant who is helping a 10 year old learn computer science.";
+
 const explain = (code: string) => {
-  const META_PROMPT = "/*\nIn one sentence, what does the above Java code do?";
-  const PROMPT = `${code.trim()}\n${META_PROMPT}`;
-  debug(PROMPT);
-  let openai = new OpenAIApi(configuration);
-  const response = openai.createCompletion({
-    model: "code-davinci-002",
-    prompt: PROMPT,
-    stop: ["*/"],
-    temperature: 0,
-    max_tokens: 50,
+  const META_PROMPT =
+    "In two sentences, what does the following Java code do?\n\n";
+  const PROMPT = `${META_PROMPT}\`\`\`${code.trim()}\n\`\`\``;
+  return new Promise((resolve, reject) => {
+    fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: [
+          { role: "system", content: SYSTEM_ROLE_CONTENT },
+          { role: "user", content: PROMPT },
+        ],
+      }),
+    })
+      .then((response) => response.json())
+      .then((response) => {
+        debug(response.choices[0].message.content);
+        resolve(response.choices[0].message.content);
+      });
   });
-  return response;
 };
 
 const translate = (text: string, language: string) => {

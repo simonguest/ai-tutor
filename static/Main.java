@@ -1,7 +1,7 @@
 /***
  * This is a simple Java program.
  */
-using System;
+import System;
 
 public class Main {
 

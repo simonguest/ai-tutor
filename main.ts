@@ -18,7 +18,6 @@ const run = async () => {
           codeButton?.attributes.removeNamedItem("disabled");
         }
       } else {
-        console.log("Disabled UI");
         codeButton?.attributes.setNamedItem(
           document.createAttribute("disabled")
         );
@@ -29,7 +28,6 @@ const run = async () => {
   // get language from URL param
   const urlParams = new URLSearchParams(window.location.search);
   const language = urlParams.get("language") || "en-us";
-  const strict = urlParams.get("strict") || "false";
 
   // Load the main.java file into the editor
   const code = await fetch("/main.java").then((response) => response.text());
@@ -49,7 +47,7 @@ const run = async () => {
     codeButton.onclick = () => {
       // Handle AI Bot tooltip click
       editor.dispatch({
-        effects: toggleHelp.of({ language: language, strict: strict }),
+        effects: toggleHelp.of({ language: language }),
       });
     };
   }

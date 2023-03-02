@@ -73,10 +73,7 @@ function createHelpPanel(view: EditorView) {
 
       if (effect.command === "explain") {
         dom.textContent = "[Thinking]";
-        explain(selection).then((response) => {
-          let answer = `\"${response.data.choices[0].text
-            .replace("\n", " ")
-            .trim()}\"`;
+        explain(selection).then((answer) => {
           view.dispatch({
             effects: toggleHelp.of({
               ...view.state.field(helpPanelState, false),
