@@ -1,16 +1,14 @@
-const { Configuration, OpenAIApi } = require("openai");
-
 import { debug } from "./utils";
 
 const SYSTEM_ROLE_CONTENT =
   "You are a teaching assistant who is helping a 10 year old learn computer science.";
 
-const gpt = (prompt: string) => {
+const gpt = (apiKey: string, prompt: string) => {
   return new Promise((resolve, reject) => {
     fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -30,26 +28,26 @@ const gpt = (prompt: string) => {
   });
 };
 
-const explain = (code: string) => {
+const explain = (apiKey: string, code: string) => {
   const META_PROMPT =
     "In two sentences, what does the following Java code do?\n\n";
   const PROMPT = `${META_PROMPT}\`\`\`${code.trim()}\n\`\`\``;
   debug(PROMPT);
-  return gpt(PROMPT);
+  return gpt(apiKey, PROMPT);
 };
 
-const translate = (text: string, language: string) => {
+const translate = (apiKey: string, text: string, language: string) => {
   const PROMPT = `Convert ${text} to ${language}`;
   debug(PROMPT);
-  return gpt(PROMPT);
+  return gpt(apiKey, PROMPT);
 };
 
-const moderate = (text: string) => {
+const moderate = (apiKey: string, text: string) => {
   return new Promise((resolve, reject) => {
     fetch("https://api.openai.com/v1/moderations", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

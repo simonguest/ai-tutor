@@ -49,8 +49,13 @@ function createHelpPanel(view: EditorView) {
       // Initial text update
       dom.textContent = "[Thinking]";
 
+      // Check for some kind of API key
+      if (!effect.apiKey || effect.apiKey === "undefined" || effect.apiKey === "null" ||  effect.apiKey === "") {
+        return dom.textContent = "[No API Key]";
+      };
+
       if (effect.command === "moderate" || !effect.command) {
-        moderate(selection).then((response) => {
+        moderate(effect.apiKey, selection).then((response) => {
           if (response === false) {
             view.dispatch({
               effects: toggleHelp.of({
@@ -74,7 +79,7 @@ function createHelpPanel(view: EditorView) {
 
       if (effect.command === "explain") {
         dom.textContent = "[Thinking]";
-        explain(selection).then((answer) => {
+        explain(effect.apiKey, selection).then((answer) => {
           view.dispatch({
             effects: toggleHelp.of({
               ...view.state.field(helpPanelState, false),
@@ -100,7 +105,7 @@ function createHelpPanel(view: EditorView) {
             });
           }, 1);
         } else {
-          translate(effect.result, effect.language).then((answer) => {
+          translate(effect.apiKey, effect.result, effect.language).then((answer) => {
             view.dispatch({
               effects: toggleHelp.of({
                 ...view.state.field(helpPanelState, false),
