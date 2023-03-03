@@ -35,7 +35,7 @@ const run = async () => {
   // get language from URL param
   const urlParams = new URLSearchParams(window.location.search);
   const language = urlParams.get("language") || "en-us";
-  const apiKey = urlParams.get("api-key") || process.env.OPENAI_API_KEY;
+  const apiKey = urlParams.get("api-key");
 
   // Load the main.java file into the editor
   const code = await fetch("/main.java").then((response) => response.text());
