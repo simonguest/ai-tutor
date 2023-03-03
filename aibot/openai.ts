@@ -25,8 +25,8 @@ const gpt = (apiKey: string, prompt: string) => {
         (response) => reject(response)
       )
       .then((response) => {
-        debug(response.choices[0].message.content);
         if (response.error) reject(response.error);
+        debug(response.choices[0].message.content);
         resolve(response.choices[0].message.content);
       });
   });
