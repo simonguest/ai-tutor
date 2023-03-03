@@ -42,7 +42,6 @@ const explain = (apiKey: string, code: string, query: Query) => {
       prompt = `In two sentences, does the following Java code have any errors?\n\n\`\`\`${code.trim()}\n\`\`\``;
       break;
   }
-
   debug(prompt);
   return gpt(apiKey, prompt);
 };

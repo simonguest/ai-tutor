@@ -2,12 +2,12 @@ import { EditorView, basicSetup } from "codemirror";
 import { ViewPlugin } from "@codemirror/view";
 import { java } from "@codemirror/lang-java";
 
-import { helpPanel, toggleHelp, Command, Query } from "./aibot";
+import { helpPanel, toggleHelp, Command, Query } from "./ai-tutor-panel";
 
 const run = async () => {
   // UI elements
   const codeButton = document.getElementById("code-button");
-  const hasBugsButton = document.getElementById("has-errors-button");
+  const hasErrorsButton = document.getElementById("has-errors-button");
 
   const codeButtonEnabled = class {
     constructor() {}
@@ -18,14 +18,14 @@ const run = async () => {
         if (codeButton?.attributes.getNamedItem("disabled")) {
           codeButton?.attributes.removeNamedItem("disabled");
         }
-        if (hasBugsButton?.attributes.getNamedItem("disabled")) {
-          hasBugsButton?.attributes.removeNamedItem("disabled");
+        if (hasErrorsButton?.attributes.getNamedItem("disabled")) {
+          hasErrorsButton?.attributes.removeNamedItem("disabled");
         }
       } else {
         codeButton?.attributes.setNamedItem(
           document.createAttribute("disabled")
         );
-        hasBugsButton?.attributes.setNamedItem(
+        hasErrorsButton?.attributes.setNamedItem(
           document.createAttribute("disabled")
         );
       }
@@ -40,6 +40,7 @@ const run = async () => {
   // Load the main.java file into the editor
   const code = await fetch("/main.java").then((response) => response.text());
 
+  // Create the main editor view
   let editor = new EditorView({
     extensions: [
       basicSetup,
@@ -53,16 +54,14 @@ const run = async () => {
 
   if (codeButton) {
     codeButton.onclick = () => {
-      // Handle AI Bot tooltip click
       editor.dispatch({
         effects: toggleHelp.of({ language: language, apiKey: apiKey, command: Command.RUN , query: Query.EXPLAIN_CODE }),
       });
     };
   }
 
-  if (hasBugsButton) {
-    hasBugsButton.onclick = () => {
-      // Handle AI Bot tooltip click
+  if (hasErrorsButton) {
+    hasErrorsButton.onclick = () => {
       editor.dispatch({
         effects: toggleHelp.of({ language: language, apiKey: apiKey, command: Command.RUN , query: Query.HAS_ERRORS }),
       });

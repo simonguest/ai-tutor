@@ -17,6 +17,14 @@ const enum Command {
   DISPLAY = 4
 }
 
+type AITutorEffect = {
+  command: Command;
+  language?: string;
+  apiKey?: string;
+  query?: Query;
+  result?: any;
+}
+
 const THINKING_MESSAGE = "[Thinking]";
 const TRANSLATING_MESSAGE = "[Translating]";
 const NO_API_KEY_MESSAGE = "[No API Key]";
@@ -41,6 +49,7 @@ function createHelpPanel(view: EditorView) {
   let dom = document.createElement("div");
   dom.className = "cm-help-panel";
 
+  // Displatch the initial run command
   setTimeout(() => {
     view.dispatch({
       effects: toggleHelp.of({
@@ -71,6 +80,7 @@ function createHelpPanel(view: EditorView) {
         return dom.textContent = NO_API_KEY_MESSAGE;
       };
 
+      // Run command - sends the selection through the moderation API
       if (effect.command === Command.RUN) {
         moderate(effect.apiKey, selection).then((response) => {
           if (response === false) {
@@ -94,6 +104,7 @@ function createHelpPanel(view: EditorView) {
         });
       }
 
+      // Explain command - sends the selection through the explain API
       if (effect.command === Command.EXPLAIN) {
         dom.textContent = THINKING_MESSAGE;
         explain(effect.apiKey, selection, effect.query).then((answer) => {
@@ -109,6 +120,7 @@ function createHelpPanel(view: EditorView) {
         });
       }
 
+      // Translate command - sends the selection through the translate API
       if (effect.command === Command.TRANSLATE) {
         dom.textContent = TRANSLATING_MESSAGE;
         if (effect.language === "en-us") {
@@ -136,6 +148,7 @@ function createHelpPanel(view: EditorView) {
         }
       }
 
+      // Display command - displays the result in the panel
       if (effect.command === Command.DISPLAY) {
         dom.textContent = effect.result;
       }
