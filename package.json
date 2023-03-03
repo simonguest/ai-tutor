@@ -5,7 +5,9 @@
   "scripts": {
     "build": "npx parcel build index.html",
     "server": "npx parcel serve index.html",
-    "publish": "npm run build && git subtree push --prefix dist origin gh-pages"
+    "commit-ghpages": "git add -A && git commit -m \"Deploy to GitHub Pages\"",
+    "prepublish": "npm run build && npm run commit-ghpages",
+    "publish": "git subtree push --prefix dist origin gh-pages"
   },
   "author": "Simon Guest",
   "license": "Apache-2.0",
