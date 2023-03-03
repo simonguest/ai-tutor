@@ -67,6 +67,8 @@ function createHelpPanel(view: EditorView) {
               }),
             });
           }
+        }, () => {
+          dom.textContent = "[OpenAI API Error]";
         });
       }
 
@@ -80,6 +82,8 @@ function createHelpPanel(view: EditorView) {
               result: answer,
             }),
           });
+        }, () => {
+          dom.textContent = "[OpenAI API Error]";
         });
       }
 
@@ -104,7 +108,9 @@ function createHelpPanel(view: EditorView) {
                 result: answer,
               }),
             });
-          });
+          }), () => {
+            dom.textContent = "[OpenAI API Error]";
+          };
         }
       }
 

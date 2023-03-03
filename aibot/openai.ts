@@ -21,9 +21,10 @@ const gpt = (prompt: string) => {
         ],
       }),
     })
-      .then((response) => response.json())
+      .then((response) => response.json(), (response) => reject(response))
       .then((response) => {
         debug(response.choices[0].message.content);
+        if (response.error) reject(response.error);
         resolve(response.choices[0].message.content);
       });
   });
@@ -55,9 +56,10 @@ const moderate = (text: string) => {
         input: text,
       }),
     })
-      .then((response) => response.json())
+      .then((response) => response.json(), (response) => reject(response))
       .then((response) => {
         debug(response);
+        if (response.error) reject(response);
         resolve(!response.results[0].flagged);
       });
   });
