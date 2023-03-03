@@ -1,7 +1,6 @@
 import { showPanel, Panel } from "@codemirror/view";
 import { StateField, StateEffect } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
-import { keymap } from "@codemirror/view";
 
 import { explain, translate, moderate } from "./openai";
 import { debug } from "./utils";
@@ -97,14 +96,12 @@ function createHelpPanel(view: EditorView) {
             });
           }, 1);
         } else {
-          translate(effect.result, effect.language).then((response) => {
+          translate(effect.result, effect.language).then((answer) => {
             view.dispatch({
               effects: toggleHelp.of({
                 ...view.state.field(helpPanelState, false),
                 command: "display",
-                result: `${response.data.choices[0].text
-                  .replace("\n", " ")
-                  .trim()}`,
+                result: answer,
               }),
             });
           });
@@ -117,18 +114,6 @@ function createHelpPanel(view: EditorView) {
     },
   };
 }
-
-const helpKeymap = [
-  {
-    key: "F1",
-    run(view) {
-      view.dispatch({
-        effects: toggleHelp.of(true),
-      });
-      return true;
-    },
-  },
-];
 
 const helpTheme = EditorView.baseTheme({
   ".cm-help-panel": {
@@ -143,7 +128,7 @@ const helpTheme = EditorView.baseTheme({
 });
 
 const helpPanel = () => {
-  return [helpPanelState, keymap.of(helpKeymap), helpTheme];
+  return [helpPanelState, helpTheme];
 };
 
 export { toggleHelp, helpPanel };
