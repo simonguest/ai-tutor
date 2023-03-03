@@ -38,7 +38,7 @@ const run = async () => {
   const apiKey = urlParams.get("api-key") || "";
 
   // Load the main.java file into the editor
-  const code = await fetch("/main.java").then((response) => response.text());
+  const code = await fetch("Main.java").then((response) => response.text());
 
   // Create the main editor view
   let editor = new EditorView({
