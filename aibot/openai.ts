@@ -1,3 +1,4 @@
+import { Query } from ".";
 import { debug } from "./utils";
 
 const SYSTEM_ROLE_CONTENT =
@@ -19,7 +20,10 @@ const gpt = (apiKey: string, prompt: string) => {
         ],
       }),
     })
-      .then((response) => response.json(), (response) => reject(response))
+      .then(
+        (response) => response.json(),
+        (response) => reject(response)
+      )
       .then((response) => {
         debug(response.choices[0].message.content);
         if (response.error) reject(response.error);
@@ -28,12 +32,19 @@ const gpt = (apiKey: string, prompt: string) => {
   });
 };
 
-const explain = (apiKey: string, code: string) => {
-  const META_PROMPT =
-    "In two sentences, what does the following Java code do?\n\n";
-  const PROMPT = `${META_PROMPT}\`\`\`${code.trim()}\n\`\`\``;
-  debug(PROMPT);
-  return gpt(apiKey, PROMPT);
+const explain = (apiKey: string, code: string, query: Query) => {
+  let prompt = "";
+  switch (query) {
+    case Query.EXPLAIN_CODE:
+      prompt = `In two sentences, what does the following Java code do?\n\n\`\`\`${code.trim()}\n\`\`\``;
+      break;
+    case Query.HAS_ERRORS:
+      prompt = `In two sentences, does the following Java code have any errors?\n\n\`\`\`${code.trim()}\n\`\`\``;
+      break;
+  }
+
+  debug(prompt);
+  return gpt(apiKey, prompt);
 };
 
 const translate = (apiKey: string, text: string, language: string) => {
@@ -54,7 +65,10 @@ const moderate = (apiKey: string, text: string) => {
         input: text,
       }),
     })
-      .then((response) => response.json(), (response) => reject(response))
+      .then(
+        (response) => response.json(),
+        (response) => reject(response)
+      )
       .then((response) => {
         debug(response);
         if (response.error) reject(response);

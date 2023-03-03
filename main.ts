@@ -2,11 +2,12 @@ import { EditorView, basicSetup } from "codemirror";
 import { ViewPlugin } from "@codemirror/view";
 import { java } from "@codemirror/lang-java";
 
-import { helpPanel, toggleHelp } from "./aibot";
+import { helpPanel, toggleHelp, Command, Query } from "./aibot";
 
 const run = async () => {
   // UI elements
   const codeButton = document.getElementById("code-button");
+  const hasBugsButton = document.getElementById("has-errors-button");
 
   const codeButtonEnabled = class {
     constructor() {}
@@ -17,8 +18,14 @@ const run = async () => {
         if (codeButton?.attributes.getNamedItem("disabled")) {
           codeButton?.attributes.removeNamedItem("disabled");
         }
+        if (hasBugsButton?.attributes.getNamedItem("disabled")) {
+          hasBugsButton?.attributes.removeNamedItem("disabled");
+        }
       } else {
         codeButton?.attributes.setNamedItem(
+          document.createAttribute("disabled")
+        );
+        hasBugsButton?.attributes.setNamedItem(
           document.createAttribute("disabled")
         );
       }
@@ -48,7 +55,16 @@ const run = async () => {
     codeButton.onclick = () => {
       // Handle AI Bot tooltip click
       editor.dispatch({
-        effects: toggleHelp.of({ language: language, apiKey: apiKey }),
+        effects: toggleHelp.of({ language: language, apiKey: apiKey, command: Command.RUN , query: Query.EXPLAIN_CODE }),
+      });
+    };
+  }
+
+  if (hasBugsButton) {
+    hasBugsButton.onclick = () => {
+      // Handle AI Bot tooltip click
+      editor.dispatch({
+        effects: toggleHelp.of({ language: language, apiKey: apiKey, command: Command.RUN , query: Query.HAS_ERRORS }),
       });
     };
   }
