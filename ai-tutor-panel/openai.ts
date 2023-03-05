@@ -39,7 +39,7 @@ const explain = (apiKey: string, code: string, query: Query) => {
       prompt = `In two sentences, what does the following Java code do?\n\n\`\`\`${code.trim()}\n\`\`\``;
       break;
     case Query.HAS_ERRORS:
-      prompt = `In two sentences, does the following Java code have any errors?\n\n\`\`\`${code.trim()}\n\`\`\``;
+      prompt = `In two sentences, are there any reasons that this Java code wouldn't work?\n\n\`\`\`${code.trim()}\n\`\`\``;
       break;
   }
   debug(prompt);
